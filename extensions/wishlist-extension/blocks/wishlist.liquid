@@ -23,7 +23,7 @@
 
 <script>
 // Load settings from app
-fetch('/apps/wishlist/api/settings')
+fetch('/apps/wishlist/api/settings', { headers: { 'ngrok-skip-browser-warning': '1' } })
   .then(function(r) { return r.json(); })
   .then(function(settings) {
     document.documentElement.style.setProperty('--wishlist-color', settings.buttonColor || '#e44444');
