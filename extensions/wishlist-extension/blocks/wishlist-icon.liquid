@@ -1,0 +1,23 @@
+<a href="/pages/wishlist" style="position:relative;display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:inherit;">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+  </svg>
+  <span id="wishlist-header-count" style="position:absolute;top:-8px;right:-8px;background:#e44;color:#fff;border-radius:50%;width:18px;height:18px;font-size:11px;display:none;align-items:center;justify-content:center;font-weight:700;">0</span>
+</a>
+<script>
+window.addEventListener('load', function() {
+  var wishlist = JSON.parse(localStorage.getItem('shopify_wishlist') || '[]');
+  var badge = document.getElementById('wishlist-header-count');
+  if (wishlist.length > 0) {
+    badge.innerText = wishlist.length;
+    badge.style.display = 'flex';
+  }
+});
+</script>
+{% schema %}
+{
+  "name": "Wishlist Icon",
+  "target": "section",
+  "settings": []
+}
+{% endschema %}

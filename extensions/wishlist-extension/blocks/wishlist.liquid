@@ -1,0 +1,74 @@
+<div id="wishlist-container">
+  <button id="wishlist-btn" onclick="toggleWishlist('{{ product.id }}', '{{ product.title }}')" style="
+    background: none;
+    border: 2px solid #e44;
+    border-radius: 50px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    color: #e44;
+    font-weight: 600;
+    margin-top: 10px;
+    width: 100%;
+  ">
+    <span id="wishlist-text-{{ product.id }}">🤍 Add to Wishlist</span>
+  </button>
+</div>
+
+<script>
+function getWishlist() {
+  return JSON.parse(localStorage.getItem('shopify_wishlist') || '[]');
+}
+
+function saveWishlist(list) {
+  localStorage.setItem('shopify_wishlist', JSON.stringify(list));
+}
+
+function toggleWishlist(productId, productTitle) {
+  var wishlist = getWishlist();
+  var index = wishlist.findIndex(function(item) { return item.id == productId; });
+  var textEl = document.getElementById('wishlist-text-' + productId);
+  
+  if (index === -1) {
+    wishlist.push({ 
+      id: productId, 
+      title: productTitle,
+      price: '{{ product.price | money }}',
+      image: '{{ product.featured_image | img_url: "300x300" }}',
+      url: '{{ product.url }}'
+    });
+    textEl.innerHTML = '❤️ Wishlisted!';
+    showToast(productTitle + ' added to wishlist!');
+  } else {
+    wishlist.splice(index, 1);
+    textEl.innerHTML = '🤍 Add to Wishlist';
+    showToast('Removed from wishlist');
+  }
+  saveWishlist(wishlist);
+}
+
+function showToast(msg) {
+  var toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#333;color:#fff;padding:12px 20px;border-radius:8px;z-index:9999;font-size:14px;';
+  toast.innerText = msg;
+  document.body.appendChild(toast);
+  setTimeout(function() { toast.remove(); }, 2500);
+}
+
+// Check if already wishlisted on page load
+window.addEventListener('load', function() {
+  var wishlist = getWishlist();
+  var textEl = document.getElementById('wishlist-text-{{ product.id }}');
+  if (textEl && wishlist.findIndex(function(item) { return item.id == '{{ product.id }}'; }) !== -1) {
+    textEl.innerHTML = '❤️ Wishlisted!';
+  }
+});
+</script>
+
+{% schema %}
+{
+  "name": "Wishlist Button",
+  "target": "section",
+  "settings": []
+}
+{% endschema %}

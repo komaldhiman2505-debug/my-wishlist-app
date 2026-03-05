@@ -1,0 +1,32 @@
+<div id="wishlist-page" style="max-width:1100px;margin:0 auto;padding:20px;font-family:sans-serif;">
+  <h1 style="font-size:28px;margin-bottom:8px;">My Wishlist</h1>
+  <p id="wishlist-count" style="color:#666;margin-bottom:24px;">0 items saved</p>
+  <div id="wishlist-empty" style="text-align:center;padding:60px 20px;">
+    <div style="font-size:60px;margin-bottom:16px;">🤍</div>
+    <h2>Your wishlist is empty</h2>
+    <a href="/collections/all" style="display:inline-block;margin-top:20px;padding:12px 24px;background:#333;color:#fff;border-radius:8px;text-decoration:none;">Shop Now</a>
+  </div>
+  <div id="wishlist-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px;"></div>
+</div>
+<script>
+function loadWishlistPage() {
+  var wishlist = JSON.parse(localStorage.getItem('shopify_wishlist') || '[]');
+  var grid = document.getElementById('wishlist-grid');
+  var empty = document.getElementById('wishlist-empty');
+  var count = document.getElementById('wishlist-count');
+  count.innerText = wishlist.length + ' items saved';
+  grid.innerHTML = '';
+  if (wishlist.length === 0) { empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  wishlist.forEach(function(item) {
+    grid.innerHTML += '<div style="border:1px solid #eee;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);"><a href="' + item.url + '"><img src="' + item.image + '" style="width:100%;height:200px;object-fit:cover;" /></a><div style="padding:16px;"><div style="font-weight:600;margin-bottom:6px;">' + item.title + '</div><div style="color:#e44;font-weight:700;margin-bottom:12px;">' + item.price + '</div><div style="display:flex;gap:8px;"><a href="' + item.url + '" style="flex:1;padding:10px;background:#333;color:#fff;border-radius:8px;text-decoration:none;text-align:center;font-size:14px;">View Product</a><button onclick="removeItem(\'' + item.id + '\')" style="padding:10px 14px;background:#ffe4e4;color:#e44;border:none;border-radius:8px;cursor:pointer;">Remove</button></div></div></div>';
+  });
+}
+function removeItem(id) {
+  var wishlist = JSON.parse(localStorage.getItem('shopify_wishlist') || '[]');
+  wishlist = wishlist.filter(function(i) { return i.id != id; });
+  localStorage.setItem('shopify_wishlist', JSON.stringify(wishlist));
+  loadWishlistPage();
+}
+window.addEventListener('load', loadWishlistPage);
+</script>
