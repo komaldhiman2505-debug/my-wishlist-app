@@ -1,8 +1,6 @@
 FROM node:20-alpine
 RUN apk add --no-cache openssl
 
-EXPOSE 3000
-
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -15,4 +13,6 @@ COPY . .
 
 RUN npm run build
 
-CMD ["npm", "run", "docker-start"]
+EXPOSE 3000
+
+CMD ["sh", "-c", "npm run setup && npx react-router-serve ./build/server/index.js"]
