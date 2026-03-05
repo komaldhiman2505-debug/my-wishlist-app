@@ -32,3 +32,29 @@ model Session {
   refreshToken        String?
   refreshTokenExpires DateTime?
 }
+
+model Settings {
+  id              Int     @id @default(autoincrement())
+  shop            String  @unique
+  buttonText      String  @default("Add to Wishlist")
+  buttonColor     String  @default("#e44444")
+  buttonStyle     String  @default("Icon + Text")
+  iconStyle       String  @default("❤️")
+  launchType      String  @default("Floating Button")
+  buttonPosition  String  @default("Bottom Right")
+  wishlistDisplay String  @default("Popup Window")
+  wishlistName    String  @default("My Wishlist")
+  requireLogin    Boolean @default(false)
+}
+
+model WishlistItem {
+  id         Int    @id @default(autoincrement())
+  shop       String
+  customerId String
+  productId  String
+  title      String
+  price      String
+  image      String
+  url        String
+  createdAt  DateTime @default(now())
+}

@@ -50,3 +50,8 @@ required = true
 [metaobjects.app.example.fields.description]
 name = "Description"
 type = "multi_line_text_field"
+
+[app_proxy]
+url = "https://9588-2404-7c80-6d-3bc6-645e-5b8d-5503-a112.ngrok-free.app"
+subpath = "wishlist"
+prefix = "apps"
