@@ -4,6 +4,7 @@ RUN apk add --no-cache openssl
 WORKDIR /app
 
 ENV NODE_ENV=production
+ENV HOST=0.0.0.0
 
 COPY package.json package-lock.json* ./
 
@@ -13,6 +14,6 @@ COPY . .
 
 RUN npm run build
 
-EXPOSE 3000
+EXPOSE 10000
 
 CMD ["sh", "-c", "npm run setup && npx react-router-serve ./build/server/index.js"]
