@@ -1,92 +1,86 @@
 <div id="wishlist-container-{{ product.id }}">
   <button id="wishlist-btn-{{ product.id }}" onclick="toggleWishlist('{{ product.id }}', '{{ product.title }}')" style="
     background: none;
-    border: 2px solid var(--wishlist-color, #e44444);
+    border: 2px solid #e44444;
     border-radius: 50px;
     padding: 10px 20px;
     cursor: pointer;
     font-size: 16px;
-    color: var(--wishlist-color, #e44444);
+    color: #e44444;
     font-weight: 600;
     margin-top: 10px;
     width: 100%;
-  ">
+    transition: all 0.3s;
+  " id="wb-{{ product.id }}">
     <span id="wishlist-text-{{ product.id }}">🤍 Add to Wishlist</span>
   </button>
 </div>
 
-<style>
-  :root {
-    --wishlist-color: #e44444;
-  }
-</style>
-
 <script>
-// Load settings from app
-fetch('/apps/wishlist/api/settings', { headers: { 'ngrok-skip-browser-warning': '1' } })
-  .then(function(r) { return r.json(); })
-  .then(function(settings) {
-    document.documentElement.style.setProperty('--wishlist-color', settings.buttonColor || '#e44444');
-    var btns = document.querySelectorAll('[id^="wishlist-btn-"]');
-    btns.forEach(function(btn) {
-      btn.style.borderColor = settings.buttonColor || '#e44444';
-      btn.style.color = settings.buttonColor || '#e44444';
-    });
-    var texts = document.querySelectorAll('[id^="wishlist-text-"]');
-    texts.forEach(function(el) {
-      if (!el.innerHTML.includes('Wishlisted')) {
-        el.innerHTML = (settings.iconStyle || '🤍') + ' ' + (settings.buttonText || 'Add to Wishlist');
-      }
-    });
+(function() {
+  fetch('/apps/wishlist/api/settings', {
+    headers: { 'ngrok-skip-browser-warning': '1', 'Accept': 'application/json' }
   })
-  .catch(function() {});
+  .then(function(r) { return r.json(); })
+  .then(function(s) {
+    var color = s.buttonColor || '#e44444';
+    var text = s.buttonText || 'Add to Wishlist';
+    var icon = s.iconStyle || '🤍';
+    var btn = document.getElementById('wb-{{ product.id }}');
+    var txtEl = document.getElementById('wishlist-text-{{ product.id }}');
+    if (btn) {
+      btn.style.borderColor = color;
+      btn.style.color = color;
+    }
+    if (txtEl && !txtEl.innerHTML.includes('Wishlisted')) {
+      txtEl.innerHTML = icon + ' ' + text;
+    }
+  })
+  .catch(function(e) { console.log('Settings fetch error:', e); });
 
-function getWishlist() {
-  return JSON.parse(localStorage.getItem('shopify_wishlist') || '[]');
-}
-
-function saveWishlist(list) {
-  localStorage.setItem('shopify_wishlist', JSON.stringify(list));
-}
-
-function toggleWishlist(productId, productTitle) {
-  var wishlist = getWishlist();
-  var index = wishlist.findIndex(function(item) { return item.id == productId; });
-  var textEl = document.getElementById('wishlist-text-' + productId);
-  
-  if (index === -1) {
-    wishlist.push({ 
-      id: productId, 
-      title: productTitle,
-      price: '{{ product.price | money }}',
-      image: '{{ product.featured_image | img_url: "300x300" }}',
-      url: '{{ product.url }}'
-    });
-    textEl.innerHTML = '❤️ Wishlisted!';
-    showToast(productTitle + ' added to wishlist!');
-  } else {
-    wishlist.splice(index, 1);
-    textEl.innerHTML = '🤍 Add to Wishlist';
-    showToast('Removed from wishlist');
+  function getWishlist() {
+    return JSON.parse(localStorage.getItem('shopify_wishlist') || '[]');
   }
-  saveWishlist(wishlist);
-}
-
-function showToast(msg) {
-  var toast = document.createElement('div');
-  toast.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#333;color:#fff;padding:12px 20px;border-radius:8px;z-index:9999;font-size:14px;';
-  toast.innerText = msg;
-  document.body.appendChild(toast);
-  setTimeout(function() { toast.remove(); }, 2500);
-}
-
-window.addEventListener('load', function() {
-  var wishlist = getWishlist();
-  var textEl = document.getElementById('wishlist-text-{{ product.id }}');
-  if (textEl && wishlist.findIndex(function(item) { return item.id == '{{ product.id }}'; }) !== -1) {
-    textEl.innerHTML = '❤️ Wishlisted!';
+  function saveWishlist(list) {
+    localStorage.setItem('shopify_wishlist', JSON.stringify(list));
   }
-});
+  window.toggleWishlist = function(productId, productTitle) {
+    var wishlist = getWishlist();
+    var index = wishlist.findIndex(function(item) { return item.id == productId; });
+    var textEl = document.getElementById('wishlist-text-' + productId);
+    var btn = document.getElementById('wb-' + productId);
+    if (index === -1) {
+      wishlist.push({
+        id: productId,
+        title: productTitle,
+        price: '{{ product.price | money }}',
+        image: '{{ product.featured_image | image_url: width: 300 }}',
+        url: '{{ product.url }}'
+      });
+      textEl.innerHTML = '❤️ Wishlisted!';
+      showToast(productTitle + ' added to wishlist!');
+    } else {
+      wishlist.splice(index, 1);
+      textEl.innerHTML = '🤍 Add to Wishlist';
+      showToast('Removed from wishlist');
+    }
+    saveWishlist(wishlist);
+  };
+  function showToast(msg) {
+    var toast = document.createElement('div');
+    toast.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#333;color:#fff;padding:12px 20px;border-radius:8px;z-index:9999;font-size:14px;';
+    toast.innerText = msg;
+    document.body.appendChild(toast);
+    setTimeout(function() { toast.remove(); }, 2500);
+  }
+  window.addEventListener('load', function() {
+    var wishlist = getWishlist();
+    var textEl = document.getElementById('wishlist-text-{{ product.id }}');
+    if (textEl && wishlist.findIndex(function(item) { return item.id == '{{ product.id }}'; }) !== -1) {
+      textEl.innerHTML = '❤️ Wishlisted!';
+    }
+  });
+})();
 </script>
 
 {% schema %}
